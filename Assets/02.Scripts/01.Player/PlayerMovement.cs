@@ -2,24 +2,10 @@ using Sirenix.OdinInspector;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
-    [TabGroup("Tab","이동 설정"), SerializeField, Range(1, 10)]
-    [LabelText("이동 속도")] private float moveSpeed = 5f; // 이동 속도
-
-    [TabGroup("Tab", "이동 설정"), SerializeField, Range(1, 5)]
-    [LabelText("방어 중 이동 속도")] private float blockMoveSpeed = 2f; // 방어 중 이동 속도
-
-    [TabGroup("Tab", "회피 설정"), SerializeField, Range(1, 20)]  
-    [LabelText("회피 강도")] private float dodgeForce = 10f; // 구르기 힘
-
-    [TabGroup("Tab", "회피 설정"), SerializeField, Range(0.1f, 2f)]
-    [LabelText("회피 시간")] private float dodgeDuration = 0.5f; // 회피 시간
-
-    [TabGroup("Tab", "회피 설정"), SerializeField, Range(1, 20)]
-    [LabelText("스테미나 소모량")] private float dodgeStamina = 15.0f;
-
     [FoldoutGroup("References"), SerializeField, Required]
     private Rigidbody rb;
 
@@ -29,8 +15,6 @@ public class PlayerMovement : MonoBehaviour
     [ShowInInspector, ReadOnly]
     private bool isDodging = false; // 회피 중인지 여부
 
-    [FoldoutGroup("References"), SerializeField, Required]
-    private PlayerStat playerStat; // 체력 및 스태미나 관련 컴포넌트 참조
 
     //===================================================================
 
@@ -39,46 +23,36 @@ public class PlayerMovement : MonoBehaviour
         if(rb == null)
             rb = GetComponent<Rigidbody>(); // Rigidbody 컴포넌트 초기화
 
-        if(playerStat == null)
-            playerStat = GetComponent<PlayerStat>(); // PlayerStat 컴포넌트 초기화
     }
 
     //===================================================================
 
     #region 이동
     [Button("Handle Movement")]
-    public void HandleMovement()
+    public void HandleMovement(Vector2 Direction, float moveSpeed, float blockMoveSpeed)
     {
         if (isDodging)
             return; // 구르기 중에는 이동하지 않음
 
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
+        float moveHorizontal = Direction.x;
+        float moveVertical = Direction.y;
         Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
 
-        if (movement != Vector3.zero) // 입력이 있을 때만 회전
-        {
-            RotateTowardsMovementDirection(movement); // 이동 방향으로 회전
-        }
+        //if (movement != Vector3.zero) // 입력이 있을 때만 회전
+        //{
+        //    RotateTowardsMovementDirection(movement); // 이동 방향으로 회전
+        //}
 
         rb.velocity = isBlocking ? movement * blockMoveSpeed : movement * moveSpeed; // 이동 속도 설정
     }
-    private void RotateTowardsMovementDirection(Vector3 movement)
-    {
-        // 이동 방향으로 플레이어 회전
-        Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
-        rb.rotation = Quaternion.Slerp(rb.rotation, targetRotation, Time.deltaTime * 10f); // 부드럽게 회전
-    }
+ 
     #endregion
 
     #region 공격
     [Button("Attack")]
-    public void Attack()
+    public void Attack(float attackDamage)
     {
-        if (playerStat.UseStamina(10f))
-        {
             Debug.Log("공격!"); // 공격 로직
-        }
     }
     #endregion
 
@@ -93,6 +67,11 @@ public class PlayerMovement : MonoBehaviour
     [Button("Stop Block")]
     public void StopBlock()
     {
+        if(isBlocking == false)
+        {
+            return;
+        }
+
         isBlocking = false;
         Debug.Log("가드 해제");
     }
@@ -100,16 +79,13 @@ public class PlayerMovement : MonoBehaviour
 
     #region 회피
     [Button("Dodge")]
-    public void Dodge()
+    public void Dodge(float dodgeForce, float dodgeDuration)
     {
-        if (playerStat.UseStamina(dodgeStamina))
-        {
-            Debug.Log("구르기"); // 회피 로직
-            StartCoroutine(DodgeRoutine()); // 회피 코루틴 시작
-        }
+        Debug.Log("구르기"); // 회피 로직
+        StartCoroutine(DodgeRoutine(dodgeForce, dodgeDuration)); // 회피 코루틴 시작
     }
 
-    private IEnumerator DodgeRoutine()
+    private IEnumerator DodgeRoutine(float dodgeForce, float dodgeDuration)
     {
         isDodging = true; // 회피 상태 설정
 

@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static UnityEditor.Searcher.Searcher.AnalyticsEvent;
@@ -54,10 +50,6 @@ public class UIManager : MonoBehaviour, IListener
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            OptionUISet();
-        }
     }
     public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param = null)
     {

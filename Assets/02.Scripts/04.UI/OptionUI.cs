@@ -1,10 +1,8 @@
 using Sirenix.OdinInspector;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class OptionUI : MonoBehaviour
 {
@@ -41,10 +39,6 @@ public class OptionUI : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            SaveBtn();
-        }
     }
     //==========================================================
 
