@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Burst.Intrinsics;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using static UnityEditor.Searcher.Searcher.AnalyticsEvent;
 
@@ -13,6 +10,8 @@ public class UIManager : MonoBehaviour, IListener
     public TitleUI titleUI;
     public InGameUI inGameUI;
     public OptionUI optionUI;
+
+
     //==========================================================
 
     void Awake()
@@ -26,6 +25,7 @@ public class UIManager : MonoBehaviour, IListener
         {
             Instance = this;
         }
+  
     }
 
     void Start()
@@ -54,11 +54,9 @@ public class UIManager : MonoBehaviour, IListener
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            OptionUISet();
-        }
+    
     }
+
     public void OnEvent(EVENT_TYPE Event_Type, Component Sender, object Param = null)
     {
     }

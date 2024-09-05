@@ -56,12 +56,14 @@ public class GameManager : MonoBehaviour
 
         if (GetCurrentState() == GameState.Paused)
         {
-            ResumeTime(); 
+            ResumeTime();
+            UIManager.Instance.OptionUISet(false);
             Debug.Log("게임 재개."); // 재개 로직
         }
         else
         {
             PauseTime();
+            UIManager.Instance.OptionUISet();
             Debug.Log("게임 일시 정지."); // 일시 정지 로직
         }
     }
