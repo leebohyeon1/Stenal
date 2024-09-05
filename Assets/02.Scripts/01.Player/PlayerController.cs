@@ -1,41 +1,39 @@
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
+    public Vector2 moveInput { get; private set; }
+    public bool attackInput { get; private set; }
+    public bool defendInput { get; private set; }
+    public bool dodgeInput { get; private set; }
+    public bool interactInput { get; private set; }
+
     private PlayerInput playerInput;
+
     private InputAction moveAction;
     private InputAction attackAction;
     private InputAction defendAction;
     private InputAction dodgeAction;
     private InputAction interactAction;
+    private InputAction pauseAction;
 
-    public Vector2 moveInput;
-    public bool attackInput;
-    public bool defendInput;
-    public bool dodgeInput;
-    public bool interactInput;
-   
     private void Awake()
     {
-        playerInput = new PlayerInput();  // Input Action Asset에서 생성한 클래스
+        playerInput = GetComponent<PlayerInput>();
 
-        // 액션 할당
-        moveAction = playerInput.Player.Move;
-        attackAction = playerInput.Player.Attack;
-        defendAction = playerInput.Player.Defend;
-        dodgeAction = playerInput.Player.Dodge;
-        interactAction = playerInput.Player.Interact;
+        SetUpInputActions();
     }
 
     private void OnEnable()
     {
-        playerInput.Enable();
+        //playerInput.Enable();
     }
 
     private void OnDisable()
     {
-        playerInput.Disable();
+        //playerInput.Disable();
     }
 
     private void Update()
@@ -44,25 +42,32 @@ public class PlayerController : MonoBehaviour
         HandleActions();
     }
 
+    private void SetUpInputActions()
+    {
+        moveAction = playerInput.actions["Move"];
+        attackAction = playerInput.actions["Attack"];
+        defendAction = playerInput.actions["Defend"];
+        dodgeAction = playerInput.actions["Dodge"];
+        interactAction = playerInput.actions["Interact"];
+        pauseAction = playerInput.actions["Pause"];
+    }
+
     private void HandleActions()
     {
         moveInput = moveAction.ReadValue<Vector2>();
 
-        attackInput = attackAction.triggered;
+        attackInput = attackAction.WasPressedThisFrame();
 
-        if (defendAction.ReadValue<float>() > 0)
+        defendInput = defendAction.IsPressed();
+
+       dodgeInput = dodgeAction.WasPressedThisFrame();
+
+        interactInput = interactAction.WasPressedThisFrame();
+
+        if(pauseAction.triggered)
         {
-            defendInput = true;
+            GameManager.Instance.PauseControl();
         }
-        else
-        {
-            defendInput = false;
-        }
-
-        dodgeInput = dodgeAction.triggered;
-
-        interactInput = interactAction.triggered;
     }
-
 
 }

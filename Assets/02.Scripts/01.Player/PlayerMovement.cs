@@ -15,6 +15,7 @@ public class PlayerMovement : MonoBehaviour
     [ShowInInspector, ReadOnly]
     private bool isDodging = false; // 회피 중인지 여부
 
+    Vector3 movement;
 
     //===================================================================
 
@@ -36,7 +37,7 @@ public class PlayerMovement : MonoBehaviour
 
         float moveHorizontal = Direction.x;
         float moveVertical = Direction.y;
-        Vector3 movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
+        movement = new Vector3(moveHorizontal, 0.0f, moveVertical);
 
         //if (movement != Vector3.zero) // 입력이 있을 때만 회전
         //{
@@ -90,7 +91,7 @@ public class PlayerMovement : MonoBehaviour
         isDodging = true; // 회피 상태 설정
 
         // 플레이어가 바라보는 방향으로 힘을 가함
-        Vector3 dodgeDirection = transform.forward * dodgeForce;
+        Vector3 dodgeDirection = movement * dodgeForce;
         rb.AddForce(dodgeDirection, ForceMode.VelocityChange); // Rigidbody에 힘을 가하여 구르기 시작
 
         yield return new WaitForSeconds(dodgeDuration); // 구르기 지속 시간 동안 대기
