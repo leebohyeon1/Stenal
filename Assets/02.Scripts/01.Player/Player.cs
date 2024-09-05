@@ -17,7 +17,7 @@ public class Player : MonoBehaviour
     [TabGroup("Tab", "체력 설정"), SerializeField, Range(0, 100)]
     [LabelText("체력")] private float health = 100f; // 체력
 
-    [TabGroup("Tab", "체력 설정")]
+    [TabGroup("Tab", "체력 설정"), SerializeField]
     [LabelText("체력 회복량")] private float healthRecoveryAmount = 50f;
     #endregion
 
@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
     [LabelText("공격력")] private float attackDamage = 7f;
     
     [TabGroup("Tab", "공격 설정"), SerializeField]
-    [LabelText("공격력")] private float attackStamina = 10f;
+    [LabelText("스테미나 소모량")] private float attackStamina = 10f;
 
     [TabGroup("Tab", "회피 설정"), SerializeField, Range(1, 20)]
     [LabelText("회피 강도")] private float dodgeForce = 10f; // 구르기 힘
@@ -70,6 +70,7 @@ public class Player : MonoBehaviour
             playerController = GetComponent<PlayerController>();
         if (playerMovement == null)
             playerMovement = GetComponent<PlayerMovement>();
+
         mainCamera = Camera.main; // 메인 카메라 가져오기
     }
 
@@ -80,6 +81,8 @@ public class Player : MonoBehaviour
         HandleMouseLook();
 
         RecoverStamina();
+
+        Pause();
     }
 
     private void FixedUpdate()
@@ -111,6 +114,12 @@ public class Player : MonoBehaviour
         if (playerController.interactInput)
         {
             playerMovement.Interact();
+        }
+
+        if (playerController.recoverHealthInput) 
+        {
+            RecoverHealth();
+
         }
 
     }
@@ -207,4 +216,12 @@ public class Player : MonoBehaviour
         // 게임 오버 처리 등 추가 로직
     }
 
+
+    private void Pause()
+    {
+        if (playerController.pauseInput)
+        {
+            GameManager.Instance.PauseControl();
+        }
+    }
 }
